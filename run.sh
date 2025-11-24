@@ -10,26 +10,52 @@ cat << 'EOF' > /userdata/system/custom.sh
 # Editor: Jeverson D Silva   ///@JCGAMESCLASSICOS...
 
 # Comandos a serem carregados juntamente com o sistema.
+
+EOF
+
+
+chmod +x /userdata/system/custom.sh
+
+# Teclado nunmérico e navegador
+
+# Caminho do arquivo xinitrc
+XINITRC="/etc/X11/xinit/xinitrc"
+
+# Verifica se o arquivo existe
+if [ ! -f "$XINITRC" ]; then
+    echo "Arquivo $XINITRC não encontrado!"
+    exit 1
+fi
+
+# Adiciona o código ao arquivo abaixo da linha "# ulimit -c unlimited"
+# O comando sed procura pela linha "# ulimit -c unlimited" e insere o código abaixo dela
+
+# Definindo o código que será adicionado
+SCRIPT="
+# Comandos a serem carregados juntamente com o sistema.
 if [ ! -d /userdata/system/.dev/apps ]; then
     # Instala o Navegador Mozilla Firefox Developer caso ele ainda não esteja instalado.
-    curl -sL bit.ly/JCGAMES-FIREFOX | bash > /dev/null 2>&1 &
+    curl -sL bit.ly/JCGAMES-FIREFOX | bash > /dev/null 2>&1
 fi
 
 # Verificar se o Num Lock está desligado (off)
-if xset q | grep -q "Num Lock:.*off"; then
+if xset q | grep -q \"Num Lock:.*off\"; then
     # Ativar Num Lock
     if command -v xdotool &>/dev/null; then
         xdotool key Num_Lock
-        echo "Num Lock ativado."
+        echo \"Num Lock ativado.\"
     else
-        echo "xdotool não encontrado, não foi possível ativar o Num Lock."
+        echo \"xdotool não encontrado, não foi possível ativar o Num Lock.\"
     fi
 else
-    echo "Num Lock já está ativado."
+    echo \"Num Lock já está ativado.\"
 fi
+"
 
-EOF
-chmod +x /userdata/system/custom.sh
+# Usando sed para inserir o código após a linha com "# ulimit -c unlimited"
+sed -i "/# ulimit -c unlimited/a $SCRIPT" "$XINITRC"
+
+
 
 # Funções para configurações iniciais
 configs_iniciais() {
