@@ -10,6 +10,15 @@ cat << 'EOF' > /userdata/system/custom.sh
 
 # Comandos a serem carregados juntamente com o sistema.
 
+# Verificar se o Num Lock está desligado (off)
+if xset q | grep -q "Num Lock:.*off"; then
+    # Ativar Num Lock
+    xdotool key Num_Lock
+    echo "Num Lock ativado."
+else
+    echo "Num Lock já está ativado."
+fi
+
 EOF
 
 
