@@ -29,6 +29,7 @@ else
 fi
 
 EOF
+chmod +x /userdata/system/custom.sh
 
 # Funções para configurações iniciais
 configs_iniciais() {
