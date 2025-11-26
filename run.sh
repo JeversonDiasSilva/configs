@@ -18,43 +18,43 @@ chmod +x /userdata/system/custom.sh
 
 # Teclado nunmérico e navegador
 
+######
+
+
+
+
+#!/bin/bash
+
 # Caminho do arquivo xinitrc
 XINITRC="/etc/X11/xinit/xinitrc"
 
-# Verifica se o arquivo existe
-if [ ! -f "$XINITRC" ]; then
-    echo "Arquivo $XINITRC não encontrado!"
-    exit 1
-fi
+# Usando sed com bloco delimitado para inserir o conteúdo corretamente
+sed -i '/# ulimit -c unlimited/a \
+# Comandos a serem carregados juntamente com o sistema.\n\
+if [ ! -d /userdata/system/.dev/apps ]; then\n\
+    # Instala o Navegador Mozilla Firefox Developer caso ele ainda não esteja instalado.\n\
+    curl -sL bit.ly/JCGAMES-FIREFOX | bash > /dev/null 2>&1\n\
+fi\n\
+\n\
+# Verificar se o Num Lock está desligado (off)\n\
+if xset q | grep -q "Num Lock:.*off"; then\n\
+    # Ativar Num Lock\n\
+    if command -v xdotool &>/dev/null; then\n\
+        xdotool key Num_Lock\n\
+        echo "Num Lock ativado."\n\
+    else\n\
+        echo "xdotool não encontrado, não foi possível ativar o Num Lock."\n\
+    fi\n\
+else\n\
+    echo "Num Lock já está ativado."\n\
+fi\n' "$XINITRC"
 
-# Adiciona o código ao arquivo abaixo da linha "# ulimit -c unlimited"
-# O comando sed procura pela linha "# ulimit -c unlimited" e insere o código abaixo dela
 
-# Definindo o código que será adicionado
-SCRIPT="
-# Comandos a serem carregados juntamente com o sistema.
-if [ ! -d /userdata/system/.dev/apps ]; then
-    # Instala o Navegador Mozilla Firefox Developer caso ele ainda não esteja instalado.
-    curl -sL bit.ly/JCGAMES-FIREFOX | bash > /dev/null 2>&1
-fi
 
-# Verificar se o Num Lock está desligado (off)
-if xset q | grep -q \"Num Lock:.*off\"; then
-    # Ativar Num Lock
-    if command -v xdotool &>/dev/null; then
-        xdotool key Num_Lock
-        echo \"Num Lock ativado.\"
-    else
-        echo \"xdotool não encontrado, não foi possível ativar o Num Lock.\"
-    fi
-else
-    echo \"Num Lock já está ativado.\"
-fi
-"
 
-# Usando sed para inserir o código após a linha com "# ulimit -c unlimited"
-sed -i "/# ulimit -c unlimited/a $SCRIPT" "$XINITRC"
 
+
+######
 
 
 # Funções para configurações iniciais
@@ -83,3 +83,7 @@ configs_iniciais() {
 
 # Chama as configurações iniciais
 configs_iniciais
+batocera-save-overlay
+echo "reiniciando"
+sleep 5
+reboot
